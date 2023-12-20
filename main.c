@@ -13,9 +13,9 @@ struct dirent **get_items(DIR *dh, int *size, flags_t flags)
 	*size = i;
 
 	if (flags.t)
-		sort_tab(tab, *size, flags.r, time_sort);
+		sort_tab(tab, *size, flags.r, time_compare);
 	else
-		sort_tab(tab, *size, flags.r, alpha_sort);
+		sort_tab(tab, *size, flags.r, name_compare);
 
 	return tab;
 }
@@ -25,6 +25,7 @@ void display(struct dirent **tab, int size, flags_t flags)
 	struct stat		st;
 	struct dirent	*d;
 	int 			i = 0;
+	char buf[1024];
 
 	while (i < size)
 	{
@@ -32,20 +33,36 @@ void display(struct dirent **tab, int size, flags_t flags)
 		if (!flags.a && d->d_name[0] == '.')	{
 			continue;
 		}
+		stat(d->d_name, &st);
 		if (flags.l)	{
-			stat(d->d_name, &st);
-			print_mode(st.st_mode);
+			print_mode(st.st_mode, d->d_type);
 			printf("%ld\t", st.st_nlink);
 			printf("%s\t", getpwuid(st.st_uid)->pw_name);
 			printf("%s\t", getgrgid(st.st_gid)->gr_name);
 			printf("%ld\t", st.st_size);
 			print_time(st);
 		}
-		// if (flags.R)	{
-		// 	printf("%s:", path);
-		// }
+
+		if (flags.R){
+			if (d->d_type == DT_DIR){
+				printf("\n%s:\n", d->d_name);
+				DIR *dh = opendir(d->d_name);
+				ft_ls(dh, flags);
+			}
+		}
+
 		printf("%s\t", d->d_name);
-		if (flags.l)
+
+		if (flags.l){
+			if (d->d_type == DT_LNK){
+				int k = readlink(d->d_name , buf, 1024);
+				if (k > 0)
+					buf[k] = '\0';
+					printf(" -> %s",buf);
+				k = 0;
+			}	
+		}
+		if(!flags.l)
 			printf("\n");
 	}
 }
@@ -63,34 +80,11 @@ void ft_ls(DIR *dh, flags_t flags)
 		exit(EXIT_FAILURE);
 	}
 
-	tab = get_items(dh, &size, flags);	
+	tab = get_items(dh, &size, flags);
 	display(tab, size, flags);
-
-
 	closedir(dh);
-}
 
-void set_flags_t(char *str, flags_t *flags)
-{
-	int i = 1;
-	while (str[i]){
-		if (str[i] == 'a')
-			flags->a = 1;
-		if (str[i] == 'l')
-			flags->l = 1;
-		if (str[i] == 'R')
-			flags->R = 1;
-		if (str[i] == 'r')
-			flags->r = 1;
-		if (str[i] == 't')
-			flags->t = 1;
-		i++;
-	}
-}
 
-void disp_flags(flags_t *flags)
-{
-	printf("%d, %d, %d, %d, %d\n", flags->a, flags->l, flags->R, flags->r, flags->t);
 }
 
 int main(int ac, char **av){

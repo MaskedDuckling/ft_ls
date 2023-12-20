@@ -1,8 +1,7 @@
 NAME = ft_ls
 CC = clang
 INC = main.h
-CFLAGS = -fsanitize=thread 
-# -Wall -Werror -Wextra 
+CFLAGS = -Wall -Werror -Wextra -fsanitize=thread
 
 SRCS	=	main.c beautiful.c
 

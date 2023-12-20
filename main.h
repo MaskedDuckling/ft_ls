@@ -23,11 +23,13 @@ typedef struct	flags_t_s
 	int t;
 }				flags_t;
 
+void	set_flags_t(char *str, flags_t *flags);
 void    sort_tab(struct dirent **tab, int size, int reversed, int(*comp)(struct dirent *a, struct dirent *b));
-int     time_sort(struct dirent *a, struct dirent *b);
-int     alpha_sort(struct dirent *a, struct dirent *b);
-void    print_mode(mode_t mode);
+int     time_compare(struct dirent *a, struct dirent *b);
+int     name_compare(struct dirent *a, struct dirent *b);
+void    print_mode(mode_t mode, unsigned char type);
 void    print_time(struct stat st);
+void	ft_ls(DIR *dh, flags_t flags);
 
 
 # endif

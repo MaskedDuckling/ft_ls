@@ -1,18 +1,34 @@
  #include "main.h"
 
-int alpha_sort(struct dirent *a, struct dirent *b)
+char lower(char c)
+{
+	if (c >= 'A' && c <= 'Z')
+		return c + 'a' - 'A';
+	return c;
+}
+
+int name_compare(struct dirent *a, struct dirent *b)
 {
 	int ia = 0; 
 	int ib = 0;
+	char *ca = a->d_name;
+	char *cb = b->d_name;
 	
-	while (a->d_name[ia] == '.')
+	while (ca[ia] && cb[ib])
+	{
+		while (ca[ia] == '.')
+			ia++;
+		while (cb[ib] == '.')
+			ib++;
+		if (lower(ca[ia]) != lower(cb[ib]))
+			return lower(ca[ia]) - lower(cb[ib]);
 		ia++;
-	while (b->d_name[ib] == '.')
 		ib++;
-	return strcmp(a->d_name + ia, b->d_name + ib);
+	}
+	return ca[ia] - cb[ib];
 }
 
-int time_sort(struct dirent *a, struct dirent *b)
+int time_compare(struct dirent *a, struct dirent *b)
 {
 	struct stat st_a;
 	struct stat st_b;
@@ -26,14 +42,15 @@ void sort_tab(struct dirent **tab, int size, int reversed, int(*comp)(struct dir
 {
 	int i = 0;
 	struct dirent *tmp;
-	
-	(void)	reversed;
+
 	while (i < size - 1)	{
-		if (comp(tab[i], tab[i + 1]) > 0)	{
+		if (comp(tab[i], tab[i + 1]) == 0)
+			i++;
+		else if ((comp(tab[i], tab[i + 1]) > 0) ^ reversed)	{
 			tmp = tab[i];
 			tab[i] = tab[i + 1];
 			tab[i + 1] = tmp;
-			i = 0;
+			i = -1;
 		}
 		i++;
 	}
@@ -53,16 +70,35 @@ void print_time(struct stat st)
 	printf("\t");
 }
 
-void	print_mode(mode_t mode)
+void	print_mode(mode_t mode, unsigned char type)
 {
-	printf("%c", S_ISDIR(mode) ? 'd' : '-');
-	printf("%c", (mode & S_IRUSR) ? 'r' : '-');
-	printf("%c", (mode & S_IWUSR) ? 'w' : '-');
-	printf("%c", (mode & S_IXUSR) ? 'x' : '-');
-	printf("%c", (mode & S_IRGRP) ? 'r' : '-');
-	printf("%c", (mode & S_IWGRP) ? 'w' : '-');
-	printf("%c", (mode & S_IXGRP) ? 'x' : '-');
-	printf("%c", (mode & S_IROTH) ? 'r' : '-');
-	printf("%c", (mode & S_IWOTH) ? 'w' : '-');
-	printf("%c\t", (mode & S_IXOTH) ? 'x' : '-');
+	printf("%c%c%c%c%c%c%c%c%c%c\t",
+			type == DT_LNK ? 'l' : type == DT_DIR ? 'd' : '-',
+			(mode & S_IRUSR) ? 'r' : '-',
+			(mode & S_IWUSR) ? 'w' : '-',
+			(mode & S_IXUSR) ? 'x' : '-',
+			(mode & S_IRGRP) ? 'r' : '-',
+			(mode & S_IWGRP) ? 'w' : '-',
+			(mode & S_IXGRP) ? 'x' : '-',
+			(mode & S_IROTH) ? 'r' : '-',
+			(mode & S_IWOTH) ? 'w' : '-',
+			(mode & S_IXOTH) ? 'x' : '-');
+}
+
+void set_flags_t(char *str, flags_t *flags)
+{
+	int i = 1;
+	while (str[i]){
+		if (str[i] == 'a')
+			flags->a = 1;
+		if (str[i] == 'l')
+			flags->l = 1;
+		if (str[i] == 'R')
+			flags->R = 1;
+		if (str[i] == 'r')
+			flags->r = 1;
+		if (str[i] == 't')
+			flags->t = 1;
+		i++;
+	}
 }
