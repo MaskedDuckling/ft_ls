@@ -49,9 +49,9 @@ void get_time(struct stat st){
     printf("\t");
 }
 
-void ft_ls(const char *dir, operator op){
+void ft_ls(Dir *dh, operator op, char *path ,int depth){
+    (void)depth;
     struct dirent *d;
-    DIR *dh = opendir(dir);
     struct stat st;
     if (!dh){
         if (errno == ENOENT){
@@ -78,6 +78,9 @@ void ft_ls(const char *dir, operator op){
 
         }
         //tri ici
+        if (op.op_R){
+            printf("%s:",path);
+        }
         printf("%s\t", d->d_name);
         if (op.op_l){
             printf("\n");
@@ -121,9 +124,11 @@ void disp_op(operator *op){
 
 int main(int ac, char **av){
     char *dir = ".";
+    DIR *dh;
     operator op = init_op();
     if (ac == 1){
-        ft_ls(".", op);
+        dh = opendir(dir);
+        ft_ls(dh, op, dir, 0);
     }
     else{
         int i = 1;
@@ -136,7 +141,8 @@ int main(int ac, char **av){
             }
             i++;
         }
-        ft_ls(dir, op);
+        dh = opendir(dir);
+        ft_ls(dir, op, dir, 0);
     }
     return 0;
 }
