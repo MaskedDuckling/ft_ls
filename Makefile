@@ -1,9 +1,9 @@
 NAME = ft_ls
 CC = clang
-INC = ft_ls.h
+INC = main.h
 CFLAGS = -Wall -Werror -Wextra -fsanitize=thread
 
-SRCS	=	main.c
+SRCS	=	main.c beautiful.c
 
 OBJS = $(SRCS:.c=.o)
 
