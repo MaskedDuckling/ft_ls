@@ -73,6 +73,10 @@ void print_time(struct stat st)
 void	print_mode(mode_t mode, unsigned char type)
 {
 	printf("%c%c%c%c%c%c%c%c%c%c\t",
+			#include <dirent.h> // Include the necessary header file
+
+			// ...
+
 			type == DT_LNK ? 'l' : type == DT_DIR ? 'd' : '-',
 			(mode & S_IRUSR) ? 'r' : '-',
 			(mode & S_IWUSR) ? 'w' : '-',
@@ -91,14 +95,19 @@ void set_flags_t(char *str, flags_t *flags)
 	while (str[i]){
 		if (str[i] == 'a')
 			flags->a = 1;
-		if (str[i] == 'l')
+		else if (str[i] == 'l')
 			flags->l = 1;
-		if (str[i] == 'R')
+		else if (str[i] == 'R')
 			flags->R = 1;
-		if (str[i] == 'r')
+		else if (str[i] == 'r')
 			flags->r = 1;
-		if (str[i] == 't')
+		else if (str[i] == 't')
 			flags->t = 1;
+		else	{
+			printf("ls: option invalide -- %c\n", str[i]);
+			printf("Saisissez « ls --help » pour plus d'informations.");
+			exit(1);
+		}
 		i++;
 	}
 }
