@@ -4,7 +4,7 @@ INC = main.h
 CFLAGS = -fsanitize=address
 # -Wall -Werror -Wextra 
 
-SRCS	=	main.c beautiful.c libft.c
+SRCS	=	main.c beautiful.c libft.c compare.c
 
 OBJS = $(SRCS:.c=.o)
 

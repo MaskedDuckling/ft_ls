@@ -7,55 +7,6 @@ char lower(char c)
 	return c;
 }
 
-int name_compare(struct dirent *a, struct dirent *b)
-{
-	int ia = 0; 
-	int ib = 0;
-	char *ca = a->d_name;
-	char *cb = b->d_name;
-	
-	while (ca[ia] && cb[ib])
-	{
-		while (ca[ia] == '.')
-			ia++;
-		while (cb[ib] == '.')
-			ib++;
-		if (lower(ca[ia]) != lower(cb[ib]))
-			return lower(ca[ia]) - lower(cb[ib]);
-		ia++;
-		ib++;
-	}
-	return ca[ia] - cb[ib];
-}
-
-int time_compare(struct dirent *a, struct dirent *b)
-{
-	struct stat st_a;
-	struct stat st_b;
-
-	stat(a->d_name, &st_a);
-	stat(b->d_name, &st_b);
-	return st_a.st_mtime - st_b.st_mtime;
-}
-
-void sort_tab(struct dirent **tab, int size, int reversed, int(*comp)(struct dirent *a, struct dirent *b))
-{
-	int i = 0;
-	struct dirent *tmp;
-
-	while (i < size - 1)	{
-		if (comp(tab[i], tab[i + 1]) == 0)
-			i++;
-		else if ((comp(tab[i], tab[i + 1]) > 0) ^ reversed)	{
-			tmp = tab[i];
-			tab[i] = tab[i + 1];
-			tab[i + 1] = tmp;
-			i = -1;
-		}
-		i++;
-	}
-}
-
 void print_time(struct stat st)
 {
 	time_t t = st.st_mtime;

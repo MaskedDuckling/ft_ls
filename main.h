@@ -28,13 +28,18 @@ typedef struct	flags_t_s
 int		ft_strcmp(char *s1, char *s2);
 char	*ft_strjoin(char *s1, char *s2);
 
-void	set_flags_t(char *str, flags_t *flags);
 void    sort_tab(struct dirent **tab, int size, int reversed, int(*comp)(struct dirent *a, struct dirent *b));
 int     time_compare(struct dirent *a, struct dirent *b);
 int     name_compare(struct dirent *a, struct dirent *b);
+void 	sort_tab_char(char **tab, int size, int reversed, int(*comp)(char *a, char *b));
+int     time_compare_char(char *a, char *b);
+int     name_compare_char(char *a, char *b);
+
+void	set_flags_t(char *str, flags_t *flags);
 void    print_mode(mode_t mode, unsigned char type);
 void    print_time(struct stat st);
 void	ft_ls(char *dir, flags_t flags);
+char 	lower(char c);
 
 
 //GERER LS SUR UN FICHIER

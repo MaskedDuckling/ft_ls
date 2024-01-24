@@ -71,6 +71,7 @@ void ft_ls(char *path, flags_t flags)
 	
 
 	dh = opendir(path);
+
 	if (!dh)	{
 		if (errno == ENOENT)
 			perror("Directory does not exist");
@@ -105,23 +106,40 @@ void ft_ls(char *path, flags_t flags)
 }
 
 int main(int ac, char **av){
-	char *path = ".";
+	char **paths;
 	flags_t flags = {0, 0, 0, 0, 0};
 
-	int i = 1;
-	while (i < ac){
-		if (av[i][0] == '-'){
+	int k = 0;
+	for (int i = 1; i < ac; i++)
+		if (av[i][0] == '-')
 			set_flags_t(av[i], &flags);
-		}
-		else{
-			path = av[i];
-		}
-		i++;
-	}
-	if (flags.R)
-		printf("%s:\n", path);
+		else
+			k++;
+	paths = malloc(sizeof(char*) * (k + 1));
+	k = 0;
+	for (int i = 1; i < ac; i++)
+		if (av[i][0] != '-')
+			paths[k++] = av[i];
+	paths[k] = NULL;
+	int size = 0;
+	while (paths[size]){ size++; }
+	if (flags.t)
+		sort_tab_char(paths, size, flags.r, time_compare_char);
+	else
+		sort_tab_char(paths, size, flags.r, name_compare_char);
+	
+	// for (int i = 0; paths[i] != 0; i++)
+	// 	printf("%s\n", paths[i]);
 
-	ft_ls(path, flags);
+	for (int i = 0; paths[i] != 0; i++){
+		if (size > 1)
+			printf("%s:\n", paths[i]);
+		ft_ls(paths[i], flags);
+		if (paths[i + 1] != 0)
+			printf("\n");
+	}
+	free(paths);
+
 	return 0;
 }
 
